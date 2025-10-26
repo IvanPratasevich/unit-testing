@@ -1,194 +1,193 @@
-import { expect } from "chai";
-import { random, shuffle } from "lodash-es";
-import { findMax, findMin, removeDuplicates } from "../utils/arrayUtils.js";
-import { randomLetter, randomStringArray, generators} from "./testGenerators.js";
+import { expect } from 'chai';
+import { random, shuffle } from 'lodash-es';
+import { findMax, findMin, removeDuplicates } from '../utils/arrayUtils.js';
+import { randomLetter, randomStringArray, generators } from './testGenerators.js';
 
 const TEST_COUNT = 5;
 const nonArrayInputs = {
-    string: "abcd",
-    number: 1,
-    null: null,
-    undefined: undefined,
-    boolean: true,
-    object: { c: 1 },
-    bigint: 20n,
-    symbol: Symbol(),
+  string: 'abcd',
+  number: 1,
+  null: null,
+  undefined: undefined,
+  boolean: true,
+  object: { c: 1 },
+  bigint: 20n,
+  symbol: Symbol(),
 };
 
+describe('array utils', () => {
+  describe('findMax', () => {
+    describe('max value calculation in arrays', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          if (type === 'string') {break;}
+          const arr = generators[type]();
+          const expected = Math.max(...arr);
+          const arrString = `[${arr.join(', ')}]`;
 
-describe("array utils", () => {
-    describe("findMax", () => {
-        describe("max value calculation in arrays", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    if (type === "string") break;
-                    const arr = generators[type]();
-                    const expected = Math.max(...arr);
-                    const arrString = `[${arr.join(", ")}]`;
-
-                    it(`should find max ${expected} in ${type} array ${arrString}`, () => {
-                        expect(findMax(arr)).to.equal(expected);
-                    });
-                }
-            }
-        });
-
-        describe("error handling for non-array inputs", () => {
-            for (const input in nonArrayInputs) {
-                it(`should throw error for type ${input}`, () => {
-                    expect(() => findMax(nonArrayInputs[input])).to.throw(
-                        "Input must be an array",
-                    );
-                });
-            }
-        });
-
-        it("should return -Infinity for empty array", () => {
-            expect(findMax([])).to.equal(-Infinity);
-        });
-
-        describe("handle single element array", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    if (type === "string") break;
-                    const arr = generators[type](1).slice(0, 1);
-                    const result = findMax(arr);
-                    it(`should handle single element in ${type} array`, () => {
-                        expect(result).to.equal(...arr);
-                    });
-                }
-            }
-        });
+          it(`should find max ${expected} in ${type} array ${arrString}`, () => {
+            expect(findMax(arr)).to.equal(expected);
+          });
+        }
+      }
     });
 
-    describe("findMin", () => {
-        describe("min value calculation in arrays", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    if (type === "string") break;
-                    const arr = generators[type]();
-                    const expected = Math.min(...arr);
-                    const arrString = `[${arr.join(", ")}]`;
-
-                    it(`should find min ${expected} in ${type} array ${arrString}`, () => {
-                        expect(findMin(arr)).to.equal(expected);
-                    });
-                }
-            }
+    describe('error handling for non-array inputs', () => {
+      for (const input in nonArrayInputs) {
+        it(`should throw error for type ${input}`, () => {
+          expect(() => findMax(nonArrayInputs[input])).to.throw(
+            'Input must be an array',
+          );
         });
-
-        describe("error handling for non-array inputs", () => {
-            for (const input in nonArrayInputs) {
-                it(`should throw error for type ${input}`, () => {
-                    expect(() => findMin(nonArrayInputs[input])).to.throw(
-                        "Input must be an array",
-                    );
-                });
-            }
-        });
-
-        it("should return Infinity for empty array", () => {
-            expect(findMin([])).to.equal(Infinity);
-        });
-
-        describe("handle single element array", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    if (type === "string") break;
-                    const arr = generators[type](1).slice(0, 1);
-                    const result = findMin(arr);
-                    it(`should handle single element in ${type} array`, () => {
-                        expect(result).to.deep.equal(...arr);
-                    });
-                }
-            }
-        });
+      }
     });
 
-    describe("removeDuplicates", () => {
-        describe("duplicate removal from arrays", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    it(`should remove duplicates correctly for ${type} array №${i}`, () => {
-                        let repeatedValue = 0;
-                        let setUppercase = !!random(0, 1);
-                        let targetArray = generators[type](7);
-
-                        switch (type) {
-                            case "positive":
-                                repeatedValue = random(1, 100);
-                                break;
-                            case "mixed":
-                                repeatedValue = random(-100, 100);
-                                targetArray = shuffle(
-                                    targetArray.concat(randomStringArray(5, setUppercase)),
-                                );
-                                break;
-                            case "negative":
-                                repeatedValue = random(-100, -1);
-                                break;
-                            case "decimal":
-                                repeatedValue = random(-4.5, -1.1);
-                                break;
-                            case "string":
-                                repeatedValue = randomLetter(setUppercase);
-                                targetArray = generators[type](7, setUppercase);
-                                break;
-
-                            default:
-                                break;
-                        }
-
-                        const repeatedValues = Array(5).fill(repeatedValue);
-                        const insertIndex = random(0, targetArray.length - 1);
-                        targetArray.splice(insertIndex, 0, ...repeatedValues);
-                        const result = removeDuplicates(targetArray);
-                        const expectedArray = [...new Set(targetArray)];
-
-                        expect(result).to.deep.equal(expectedArray);
-                    });
-                }
-            }
-        });
-
-        describe("arrays without duplicates", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    it(`should handle ${type} array with no duplicates`, () => {
-                        const targetArray = generators[type](7);
-                        const result = removeDuplicates(targetArray);
-                        const expectedArray = [...new Set(targetArray)];
-                        expect(result).to.deep.equal(expectedArray);
-                    });
-                }
-            }
-        });
-
-        it("should return empty array when input is empty", () => {
-            expect(removeDuplicates([])).to.deep.equal([]);
-        });
-
-        describe("error handling for non-array inputs", () => {
-            for (const input in nonArrayInputs) {
-                it(`should throw error for type ${input}`, () => {
-                    expect(() => removeDuplicates(nonArrayInputs[input])).to.throw(
-                        "Input must be an array",
-                    );
-                });
-            }
-        });
-
-        describe("handle single element array", () => {
-            for (const type in generators) {
-                for (let i = 1; i <= TEST_COUNT; i++) {
-                    if (type === "string") break;
-                    const arr = generators[type](1).slice(0, 1);
-                    const result = removeDuplicates(arr);
-                    it(`should handle single element ${type} array`, () => {
-                        expect(result).to.deep.equal(arr);
-                    });
-                }
-            }
-        });
+    it('should return -Infinity for empty array', () => {
+      expect(findMax([])).to.equal(-Infinity);
     });
+
+    describe('handle single element array', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          if (type === 'string') {break;}
+          const arr = generators[type](1).slice(0, 1);
+          const result = findMax(arr);
+          it(`should handle single element in ${type} array`, () => {
+            expect(result).to.equal(...arr);
+          });
+        }
+      }
+    });
+  });
+
+  describe('findMin', () => {
+    describe('min value calculation in arrays', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          if (type === 'string') {break;}
+          const arr = generators[type]();
+          const expected = Math.min(...arr);
+          const arrString = `[${arr.join(', ')}]`;
+
+          it(`should find min ${expected} in ${type} array ${arrString}`, () => {
+            expect(findMin(arr)).to.equal(expected);
+          });
+        }
+      }
+    });
+
+    describe('error handling for non-array inputs', () => {
+      for (const input in nonArrayInputs) {
+        it(`should throw error for type ${input}`, () => {
+          expect(() => findMin(nonArrayInputs[input])).to.throw(
+            'Input must be an array',
+          );
+        });
+      }
+    });
+
+    it('should return Infinity for empty array', () => {
+      expect(findMin([])).to.equal(Infinity);
+    });
+
+    describe('handle single element array', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          if (type === 'string') {break;}
+          const arr = generators[type](1).slice(0, 1);
+          const result = findMin(arr);
+          it(`should handle single element in ${type} array`, () => {
+            expect(result).to.deep.equal(...arr);
+          });
+        }
+      }
+    });
+  });
+
+  describe('removeDuplicates', () => {
+    describe('duplicate removal from arrays', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          it(`should remove duplicates correctly for ${type} array №${i}`, () => {
+            let repeatedValue = 0;
+            const setUppercase = !!random(0, 1);
+            let targetArray = generators[type](7);
+
+            switch (type) {
+            case 'positive':
+              repeatedValue = random(1, 100);
+              break;
+            case 'mixed':
+              repeatedValue = random(-100, 100);
+              targetArray = shuffle(
+                targetArray.concat(randomStringArray(5, setUppercase)),
+              );
+              break;
+            case 'negative':
+              repeatedValue = random(-100, -1);
+              break;
+            case 'decimal':
+              repeatedValue = random(-4.5, -1.1);
+              break;
+            case 'string':
+              repeatedValue = randomLetter(setUppercase);
+              targetArray = generators[type](7, setUppercase);
+              break;
+
+            default:
+              break;
+            }
+
+            const repeatedValues = Array(5).fill(repeatedValue);
+            const insertIndex = random(0, targetArray.length - 1);
+            targetArray.splice(insertIndex, 0, ...repeatedValues);
+            const result = removeDuplicates(targetArray);
+            const expectedArray = [...new Set(targetArray)];
+
+            expect(result).to.deep.equal(expectedArray);
+          });
+        }
+      }
+    });
+
+    describe('arrays without duplicates', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          it(`should handle ${type} array with no duplicates`, () => {
+            const targetArray = generators[type](7);
+            const result = removeDuplicates(targetArray);
+            const expectedArray = [...new Set(targetArray)];
+            expect(result).to.deep.equal(expectedArray);
+          });
+        }
+      }
+    });
+
+    it('should return empty array when input is empty', () => {
+      expect(removeDuplicates([])).to.deep.equal([]);
+    });
+
+    describe('error handling for non-array inputs', () => {
+      for (const input in nonArrayInputs) {
+        it(`should throw error for type ${input}`, () => {
+          expect(() => removeDuplicates(nonArrayInputs[input])).to.throw(
+            'Input must be an array',
+          );
+        });
+      }
+    });
+
+    describe('handle single element array', () => {
+      for (const type in generators) {
+        for (let i = 1; i <= TEST_COUNT; i++) {
+          if (type === 'string') {break;}
+          const arr = generators[type](1).slice(0, 1);
+          const result = removeDuplicates(arr);
+          it(`should handle single element ${type} array`, () => {
+            expect(result).to.deep.equal(arr);
+          });
+        }
+      }
+    });
+  });
 });
