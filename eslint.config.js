@@ -1,7 +1,7 @@
 import globals from 'globals';
 
 export default {
-  ignores: ['node_modules/**', 'coverage/**', 'mochawesome-report/**', '.idea/**'],
+  ignores: ['node_modules/**', 'coverage/', 'mochawesome-report/**', '.idea/**'],
   files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
   languageOptions: {
     ecmaVersion: 2021,
