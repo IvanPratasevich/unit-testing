@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Unit testing",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --require @babel/register"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "chai": "^6.2.0",
     "eslint": "^9.38.0",
     "husky": "^9.1.7",
+    "lodash-es": "^4.17.21",
     "mocha": "^11.7.4"
   }
 }
